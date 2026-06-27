@@ -25,8 +25,28 @@ const authLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+// Allowed origins for CORS
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://omni-tracker-mern-stack.vercel.app',
+  'https://omni-tracker-mern-stack-ot5aj74ar-rudy2.vercel.app',
+  process.env.CLIENT_ORIGIN
+].filter(Boolean);
+
 // Middleware
-app.use(cors({ origin: process.env.CLIENT_ORIGIN || 'http://localhost:5173' }));
+app.use(cors({
+  origin: function (origin, callback) {
+    // allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.includes('*')) {
+      callback(null, true);
+    } else {
+      callback(new Error('The CORS policy for this site does not allow access from the specified Origin.'));
+    }
+  },
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
