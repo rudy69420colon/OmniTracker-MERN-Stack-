@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, LayoutGrid, List } from 'lucide-react';
 import Navbar from '../components/common/Navbar';
 import TaskFilter from '../components/tasks/TaskFilter';
 import TaskList from '../components/tasks/TaskList';
+import KanbanBoard from '../components/tasks/KanbanBoard';
 import TaskForm from '../components/tasks/TaskForm';
 import useTasks from '../hooks/useTasks';
 
@@ -11,6 +12,7 @@ const DashboardPage = () => {
   const [filters, setFilters] = useState({ status: '', priority: '', sort: '', search: '' });
   const [showForm, setShowForm] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
+  const [view, setView] = useState('kanban'); // 'list' or 'kanban'
 
   useEffect(() => {
     fetchTasks(filters);
@@ -85,24 +87,54 @@ const DashboardPage = () => {
         {/* Filter + Add Row */}
         <div className="controls-row">
           <TaskFilter filters={filters} onChange={handleFilterChange} />
-          <button
-            id="add-task-btn"
-            className="btn-primary"
-            onClick={() => { setEditingTask(null); setShowForm(true); }}
-          >
-            <Plus size={16} />
-            New Task
-          </button>
+          
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <div className="view-toggle">
+              <button 
+                className={`view-toggle-btn ${view === 'list' ? 'active' : ''}`}
+                onClick={() => setView('list')}
+                title="List View"
+              >
+                <List size={16} />
+              </button>
+              <button 
+                className={`view-toggle-btn ${view === 'kanban' ? 'active' : ''}`}
+                onClick={() => setView('kanban')}
+                title="Kanban View"
+              >
+                <LayoutGrid size={16} />
+              </button>
+            </div>
+
+            <button
+              id="add-task-btn"
+              className="btn-primary"
+              onClick={() => { setEditingTask(null); setShowForm(true); }}
+            >
+              <Plus size={16} />
+              New Task
+            </button>
+          </div>
         </div>
 
-        {/* Task List */}
-        <TaskList
-          tasks={tasks}
-          loading={loading}
-          onEdit={handleEditTask}
-          onDelete={deleteTask}
-          onStatusChange={handleStatusChange}
-        />
+        {/* Task View */}
+        {view === 'list' ? (
+          <TaskList
+            tasks={tasks}
+            loading={loading}
+            onEdit={handleEditTask}
+            onDelete={deleteTask}
+            onStatusChange={handleStatusChange}
+          />
+        ) : (
+          <KanbanBoard
+            tasks={tasks}
+            loading={loading}
+            onEdit={handleEditTask}
+            onDelete={deleteTask}
+            onStatusChange={handleStatusChange}
+          />
+        )}
       </main>
 
       {/* Task Modal */}
