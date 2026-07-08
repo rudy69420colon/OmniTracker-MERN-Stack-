@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
+import ErrorBoundary from './components/common/ErrorBoundary';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -13,13 +14,23 @@ const App = () => {
       <AuthProvider>
         <Router>
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/login" element={
+            <ErrorBoundary>
+              <LoginPage />
+            </ErrorBoundary>
+          } />
+          <Route path="/register" element={
+            <ErrorBoundary>
+              <RegisterPage />
+            </ErrorBoundary>
+          } />
           <Route
             path="/dashboard"
             element={
               <ProtectedRoute>
-                <DashboardPage />
+                <ErrorBoundary>
+                  <DashboardPage />
+                </ErrorBoundary>
               </ProtectedRoute>
             }
           />

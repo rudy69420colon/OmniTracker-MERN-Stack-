@@ -3,6 +3,8 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./config/swagger');
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const taskRoutes = require('./routes/taskRoutes');
@@ -30,6 +32,7 @@ const allowedOrigins = [
   'http://localhost:5173',
   'https://omni-tracker-mern-stack.vercel.app',
   'https://omni-tracker-mern-stack-ot5aj74ar-rudy2.vercel.app',
+  'https://gray-beach-0e4a8ce00.7.azurestaticapps.net',
   process.env.CLIENT_ORIGIN
 ].filter(Boolean);
 
@@ -54,6 +57,12 @@ app.use(express.urlencoded({ extended: false }));
 app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
 });
+
+// Swagger API docs
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'OmniTracker API Docs',
+}));
 
 // Routes
 app.use('/api/auth', authLimiter, authRoutes);

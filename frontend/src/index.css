@@ -848,3 +848,192 @@ body.light-theme .dashboard-layout {
     radial-gradient(ellipse at top right, #6c63ff15 0%, transparent 50%),
     var(--bg-base);
 }
+
+/* ─── NEW POLISH & COMPONENTS ───────────────────── */
+
+/* Skeleton Loading */
+.skeleton-card {
+  pointer-events: none;
+}
+.skeleton-line {
+  background: var(--bg-elevated);
+  border-radius: var(--radius-sm);
+  position: relative;
+  overflow: hidden;
+}
+.skeleton-line::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.05),
+    transparent
+  );
+  transform: translateX(-100%);
+  animation: shimmer 1.5s infinite;
+}
+body.light-theme .skeleton-line::after {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0, 0, 0, 0.05),
+    transparent
+  );
+}
+
+.skeleton-badge { width: 60px; height: 24px; border-radius: var(--radius-full); }
+.skeleton-icon { width: 24px; height: 24px; border-radius: var(--radius-full); }
+.skeleton-title { width: 70%; height: 20px; margin: 12px 0; }
+.skeleton-desc { width: 100%; height: 14px; margin-bottom: 6px; }
+.skeleton-desc.short { width: 50%; margin-bottom: 16px; }
+.skeleton-date { width: 100px; height: 16px; margin-top: auto; }
+
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
+
+/* Guest Banner */
+.guest-banner {
+  background: rgba(243, 139, 168, 0.1);
+  border-bottom: 1px solid rgba(243, 139, 168, 0.2);
+  color: #f38ba8;
+  padding: var(--space-sm) var(--space-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  font-size: 13px;
+  animation: slideDown 0.3s ease;
+  z-index: 40;
+}
+.guest-banner-content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+.guest-banner-cta {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #f38ba8;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  transition: all 0.2s ease;
+}
+.guest-banner-cta:hover {
+  color: #fff;
+}
+body.light-theme .guest-banner {
+  background: rgba(229, 57, 53, 0.1);
+  border-bottom-color: rgba(229, 57, 53, 0.2);
+  color: #d32f2f;
+}
+body.light-theme .guest-banner-cta { color: #d32f2f; }
+body.light-theme .guest-banner-cta:hover { color: #b71c1c; }
+
+@keyframes slideDown {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(0); }
+}
+
+/* User Badge */
+.user-badge {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+.user-badge-guest {
+  color: #f38ba8;
+}
+body.light-theme .user-badge-guest {
+  color: #d32f2f;
+}
+
+/* Auth Divider */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: var(--space-md) 0;
+  color: var(--text-muted);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--border);
+}
+.auth-divider span {
+  padding: 0 var(--space-sm);
+}
+
+/* Drag Overlay & Interactions */
+.draggable-card.is-dragging {
+  position: relative;
+}
+.draggable-card.is-dragging::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--border-focus);
+}
+.drag-overlay-card {
+  transform: rotate(2deg) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  border-radius: var(--radius-md);
+  cursor: grabbing !important;
+}
+
+/* Error Boundary */
+.error-boundary {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md);
+  background: var(--bg-base);
+}
+.error-boundary-content {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  text-align: center;
+  max-width: 500px;
+  width: 100%;
+  animation: slideUp 0.4s ease;
+}
+.error-boundary-icon {
+  color: #f38ba8;
+  margin-bottom: var(--space-md);
+}
+.error-boundary-content h2 {
+  font-size: 24px;
+  margin-bottom: var(--space-sm);
+}
+.error-boundary-content p {
+  color: var(--text-secondary);
+  margin-bottom: var(--space-lg);
+}
+.error-boundary-details {
+  background: var(--bg-base);
+  padding: var(--space-sm);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 12px;
+  text-align: left;
+  overflow-x: auto;
+  margin-bottom: var(--space-lg);
+}

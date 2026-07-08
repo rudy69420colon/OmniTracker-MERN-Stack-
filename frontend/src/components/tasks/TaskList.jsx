@@ -1,15 +1,10 @@
 import TaskCard from './TaskCard';
-import Spinner from '../common/Spinner';
+import { TaskCardSkeletonGrid } from './TaskCardSkeleton';
 import { ClipboardList } from 'lucide-react';
 
 const TaskList = ({ tasks, loading, onEdit, onDelete, onStatusChange }) => {
   if (loading) {
-    return (
-      <div className="empty-state">
-        <Spinner size="lg" />
-        <p>Loading tasks...</p>
-      </div>
-    );
+    return <TaskCardSkeletonGrid count={6} />;
   }
 
   if (tasks.length === 0) {

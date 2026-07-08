@@ -64,6 +64,28 @@ describe('Auth Routes', () => {
       expect(res.statusCode).toBe(409);
       expect(res.body.message).toMatch(/already exists/i);
     });
+
+    it('should return 400 for an invalid email format', async () => {
+      const res = await request(app).post('/api/auth/register').send({
+        name: 'Test User',
+        email: 'not-an-email',
+        password: 'password123',
+      });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.message).toMatch(/email/i);
+    });
+
+    it('should return 400 if password is too short', async () => {
+      const res = await request(app).post('/api/auth/register').send({
+        name: 'Test User',
+        email: 'valid@example.com',
+        password: '123',
+      });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.message).toMatch(/6/);
+    });
   });
 
   // ─── LOGIN ──────────────────────────────────────────────────────────────
@@ -125,6 +147,26 @@ describe('Auth Routes', () => {
     it('should return 401 without a token', async () => {
       const res = await request(app).get('/api/auth/me');
       expect(res.statusCode).toBe(401);
+    });
+  });
+
+  // ─── GUEST ──────────────────────────────────────────────────────────────
+
+  describe('POST /api/auth/guest', () => {
+    it('should create a guest account and return a token', async () => {
+      User.create.mockResolvedValue({
+        _id: '507f1f77bcf86cd799439099',
+        name: 'Guest_abc123',
+        email: 'guest_abc123@guest.omnitracker.local',
+        isGuest: true,
+      });
+
+      const res = await request(app).post('/api/auth/guest').send();
+
+      expect(res.statusCode).toBe(201);
+      expect(res.body).toHaveProperty('token');
+      expect(res.body.isGuest).toBe(true);
+      expect(res.body.name).toMatch(/guest/i);
     });
   });
 });

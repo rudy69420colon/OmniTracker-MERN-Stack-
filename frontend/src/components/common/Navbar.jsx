@@ -1,6 +1,6 @@
 import { useContext } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { LogOut, CheckSquare, User, Sun, Moon } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { LogOut, CheckSquare, User, UserX, Sun, Moon } from 'lucide-react';
 import useAuth from '../../hooks/useAuth';
 import { ThemeContext } from '../../context/ThemeContext';
 
@@ -26,9 +26,9 @@ const Navbar = () => {
           <button className="btn-icon theme-toggle" onClick={toggleTheme} title="Toggle theme">
             {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
           </button>
-          <div className="user-badge">
-            <User size={15} />
-            <span>{user.name}</span>
+          <div className={`user-badge ${user.isGuest ? 'user-badge-guest' : ''}`}>
+            {user.isGuest ? <UserX size={15} /> : <User size={15} />}
+            <span>{user.isGuest ? 'Guest' : user.name}</span>
           </div>
           <button className="btn-logout" onClick={handleLogout} id="logout-btn">
             <LogOut size={16} />

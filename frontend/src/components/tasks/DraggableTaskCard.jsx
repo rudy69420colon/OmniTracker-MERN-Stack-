@@ -15,6 +15,9 @@ const DraggableTaskCard = ({ task, onEdit, onDelete, onStatusChange }) => {
     transform: CSS.Translate.toString(transform),
     // Ensure the dragging card stays on top
     zIndex: isDragging ? 100 : 'auto',
+    // Hide original when drag overlay is shown
+    opacity: isDragging ? 0.3 : 1,
+    transition: isDragging ? 'none' : 'opacity 0.2s ease, transform 0.2s ease',
   };
 
   return (
@@ -25,10 +28,6 @@ const DraggableTaskCard = ({ task, onEdit, onDelete, onStatusChange }) => {
       {...listeners}
       className={`draggable-card ${isDragging ? 'is-dragging' : ''}`}
     >
-      {/* 
-        We pass a dummy onStatusChange while dragging if we wanted to disable it,
-        but since dnd-kit handles events carefully, we can just pass the real one.
-      */}
       <TaskCard
         task={task}
         onEdit={onEdit}

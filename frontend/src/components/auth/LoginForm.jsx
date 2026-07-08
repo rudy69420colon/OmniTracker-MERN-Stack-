@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, Eye, EyeOff, LogIn } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, LogIn, UserX } from 'lucide-react';
 import useAuth from '../../hooks/useAuth';
 import toast from 'react-hot-toast';
 
 const LoginForm = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
-  const { login, loading } = useAuth();
+  const [guestLoading, setGuestLoading] = useState(false);
+  const { login, loginAsGuest, loading } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) =>
@@ -21,6 +22,19 @@ const LoginForm = () => {
       navigate('/dashboard');
     } catch (err) {
       toast.error(err.response?.data?.message || 'Login failed');
+    }
+  };
+
+  const handleGuestLogin = async () => {
+    setGuestLoading(true);
+    try {
+      await loginAsGuest();
+      toast.success('Welcome, guest! Your data will reset in 24 hours.');
+      navigate('/dashboard');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Guest login failed');
+    } finally {
+      setGuestLoading(false);
     }
   };
 
@@ -83,6 +97,21 @@ const LoginForm = () => {
           {loading ? 'Signing in...' : 'Sign In'}
         </button>
       </form>
+
+      <div className="auth-divider">
+        <span>or</span>
+      </div>
+
+      <button
+        id="guest-login-btn"
+        type="button"
+        className="btn-ghost btn-full"
+        onClick={handleGuestLogin}
+        disabled={guestLoading}
+      >
+        <UserX size={16} />
+        {guestLoading ? 'Creating guest...' : 'Continue as Guest'}
+      </button>
 
       <p className="auth-footer">
         Don&apos;t have an account?{' '}

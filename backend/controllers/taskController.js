@@ -43,6 +43,8 @@ const createTask = asyncHandler(async (req, res) => {
     status,
     priority,
     dueDate,
+    // Inherit guest expiry so tasks auto-delete with the guest account
+    guestExpiresAt: req.user.isGuest ? req.user.guestExpiresAt : null,
   });
 
   res.status(201).json(task);

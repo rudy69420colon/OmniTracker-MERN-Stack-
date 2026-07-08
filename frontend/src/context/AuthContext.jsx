@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useState, useCallback } from 'react';
 import axiosInstance from '../api/axiosInstance';
 
 export const AuthContext = createContext(null);
@@ -15,22 +15,41 @@ export const AuthProvider = ({ children }) => {
 
   const login = useCallback(async (email, password) => {
     setLoading(true);
-    const { data } = await axiosInstance.post('/auth/login', { email, password });
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('user', JSON.stringify({ _id: data._id, name: data.name, email: data.email }));
-    setUser({ _id: data._id, name: data.name, email: data.email });
-    setLoading(false);
-    return data;
+    try {
+      const { data } = await axiosInstance.post('/auth/login', { email, password });
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify({ _id: data._id, name: data.name, email: data.email, isGuest: false }));
+      setUser({ _id: data._id, name: data.name, email: data.email, isGuest: false });
+      return data;
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   const register = useCallback(async (name, email, password) => {
     setLoading(true);
-    const { data } = await axiosInstance.post('/auth/register', { name, email, password });
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('user', JSON.stringify({ _id: data._id, name: data.name, email: data.email }));
-    setUser({ _id: data._id, name: data.name, email: data.email });
-    setLoading(false);
-    return data;
+    try {
+      const { data } = await axiosInstance.post('/auth/register', { name, email, password });
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify({ _id: data._id, name: data.name, email: data.email, isGuest: false }));
+      setUser({ _id: data._id, name: data.name, email: data.email, isGuest: false });
+      return data;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const loginAsGuest = useCallback(async () => {
+    setLoading(true);
+    try {
+      const { data } = await axiosInstance.post('/auth/guest');
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify({ _id: data._id, name: data.name, email: data.email, isGuest: true }));
+      setUser({ _id: data._id, name: data.name, email: data.email, isGuest: true });
+      return data;
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   const logout = useCallback(() => {
@@ -40,7 +59,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, loginAsGuest, logout }}>
       {children}
     </AuthContext.Provider>
   );

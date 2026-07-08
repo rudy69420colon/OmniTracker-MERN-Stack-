@@ -67,6 +67,26 @@ describe('Task Routes', () => {
 
       expect(res.statusCode).toBe(401);
     });
+
+    it('should return 400 for an invalid priority value', async () => {
+      const res = await request(app)
+        .post('/api/tasks')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({ title: 'Valid Title', priority: 'urgent' });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.message).toMatch(/priority/i);
+    });
+
+    it('should return 400 for an invalid status value', async () => {
+      const res = await request(app)
+        .post('/api/tasks')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({ title: 'Valid Title', status: 'completed' });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.message).toMatch(/status/i);
+    });
   });
 
   // ─── GET TASKS ───────────────────────────────────────────────────────────
@@ -84,6 +104,42 @@ describe('Task Routes', () => {
       expect(res.statusCode).toBe(200);
       expect(Array.isArray(res.body)).toBe(true);
       expect(res.body[0].title).toBe('Test Task');
+    });
+  });
+
+  // ─── GET SINGLE TASK ────────────────────────────────────────────────────
+
+  describe('GET /api/tasks/:id', () => {
+    it('should return a single task by ID', async () => {
+      Task.findById.mockResolvedValue(mockTask);
+
+      const res = await request(app)
+        .get(`/api/tasks/${mockTask._id}`)
+        .set('Authorization', `Bearer ${authToken}`);
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.title).toBe('Test Task');
+    });
+
+    it('should return 404 for a non-existent task', async () => {
+      Task.findById.mockResolvedValue(null);
+
+      const res = await request(app)
+        .get('/api/tasks/507f1f77bcf86cd799439099')
+        .set('Authorization', `Bearer ${authToken}`);
+
+      expect(res.statusCode).toBe(404);
+    });
+
+    it('should return 403 when accessing another user\'s task', async () => {
+      const otherUserTask = { ...mockTask, user: '000000000000000000000099' };
+      Task.findById.mockResolvedValue(otherUserTask);
+
+      const res = await request(app)
+        .get(`/api/tasks/${mockTask._id}`)
+        .set('Authorization', `Bearer ${authToken}`);
+
+      expect(res.statusCode).toBe(403);
     });
   });
 
@@ -118,6 +174,17 @@ describe('Task Routes', () => {
 
       expect(res.statusCode).toBe(403);
     });
+
+    it('should return 404 when updating a non-existent task', async () => {
+      Task.findById.mockResolvedValue(null);
+
+      const res = await request(app)
+        .put('/api/tasks/507f1f77bcf86cd799439099')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({ title: 'Ghost Task' });
+
+      expect(res.statusCode).toBe(404);
+    });
   });
 
   // ─── DELETE TASK ─────────────────────────────────────────────────────────
@@ -132,6 +199,17 @@ describe('Task Routes', () => {
 
       expect(res.statusCode).toBe(200);
       expect(res.body.message).toMatch(/deleted/i);
+    });
+
+    it('should return 403 when deleting another user\'s task', async () => {
+      const otherUserTask = { ...mockTask, user: '000000000000000000000099' };
+      Task.findById.mockResolvedValue(otherUserTask);
+
+      const res = await request(app)
+        .delete(`/api/tasks/${mockTask._id}`)
+        .set('Authorization', `Bearer ${authToken}`);
+
+      expect(res.statusCode).toBe(403);
     });
   });
 });

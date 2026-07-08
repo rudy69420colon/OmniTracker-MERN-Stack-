@@ -1,7 +1,9 @@
-import { DndContext, closestCorners, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { DndContext, closestCorners, KeyboardSensor, PointerSensor, useSensor, useSensors, DragOverlay } from '@dnd-kit/core';
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
+import { useState } from 'react';
 import KanbanColumn from './KanbanColumn';
-import Spinner from '../common/Spinner';
+import TaskCard from './TaskCard';
+import { TaskCardSkeletonColumn } from './TaskCardSkeleton';
 
 const COLUMNS = [
   { id: 'todo', title: 'To Do' },
@@ -10,6 +12,8 @@ const COLUMNS = [
 ];
 
 const KanbanBoard = ({ tasks, loading, onEdit, onDelete, onStatusChange }) => {
+  const [activeTask, setActiveTask] = useState(null);
+
   // Setup drag sensors
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -22,8 +26,14 @@ const KanbanBoard = ({ tasks, loading, onEdit, onDelete, onStatusChange }) => {
     })
   );
 
+  const handleDragStart = (event) => {
+    const task = event.active.data.current?.task;
+    if (task) setActiveTask(task);
+  };
+
   const handleDragEnd = (event) => {
     const { active, over } = event;
+    setActiveTask(null);
 
     // If dropped outside any droppable area
     if (!over) return;
@@ -41,9 +51,20 @@ const KanbanBoard = ({ tasks, loading, onEdit, onDelete, onStatusChange }) => {
 
   if (loading) {
     return (
-      <div className="empty-state">
-        <Spinner size="lg" />
-        <p>Loading board...</p>
+      <div className="kanban-board">
+        {COLUMNS.map((col) => (
+          <div key={col.id} className="kanban-column">
+            <div className="kanban-column-header">
+              <h3>
+                {col.title}
+                <span className="kanban-count">—</span>
+              </h3>
+            </div>
+            <div className="kanban-column-content">
+              <TaskCardSkeletonColumn count={2} />
+            </div>
+          </div>
+        ))}
       </div>
     );
   }
@@ -52,6 +73,7 @@ const KanbanBoard = ({ tasks, loading, onEdit, onDelete, onStatusChange }) => {
     <DndContext 
       sensors={sensors} 
       collisionDetection={closestCorners} 
+      onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
       <div className="kanban-board">
@@ -67,6 +89,23 @@ const KanbanBoard = ({ tasks, loading, onEdit, onDelete, onStatusChange }) => {
           />
         ))}
       </div>
+
+      {/* Drag overlay — shows a polished floating card preview */}
+      <DragOverlay dropAnimation={{
+        duration: 200,
+        easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)',
+      }}>
+        {activeTask ? (
+          <div className="drag-overlay-card">
+            <TaskCard
+              task={activeTask}
+              onEdit={() => {}}
+              onDelete={() => {}}
+              onStatusChange={() => {}}
+            />
+          </div>
+        ) : null}
+      </DragOverlay>
     </DndContext>
   );
 };

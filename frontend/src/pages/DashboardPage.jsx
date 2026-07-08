@@ -1,14 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Plus, LayoutGrid, List } from 'lucide-react';
 import Navbar from '../components/common/Navbar';
+import GuestBanner from '../components/common/GuestBanner';
 import TaskFilter from '../components/tasks/TaskFilter';
 import TaskList from '../components/tasks/TaskList';
 import KanbanBoard from '../components/tasks/KanbanBoard';
 import TaskForm from '../components/tasks/TaskForm';
 import useTasks from '../hooks/useTasks';
+import useAuth from '../hooks/useAuth';
 
 const DashboardPage = () => {
   const { tasks, loading, fetchTasks, createTask, updateTask, deleteTask } = useTasks();
+  const { user } = useAuth();
   const [filters, setFilters] = useState({ status: '', priority: '', sort: '', search: '' });
   const [showForm, setShowForm] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
@@ -55,6 +58,7 @@ const DashboardPage = () => {
   return (
     <div className="dashboard-layout">
       <Navbar />
+      {user?.isGuest && <GuestBanner />}
 
       <main className="dashboard-main">
         {/* Stats Bar */}

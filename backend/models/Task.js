@@ -39,11 +39,18 @@ const taskSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    guestExpiresAt: {
+      type: Date,
+      default: null,
+    },
   },
   { timestamps: true }
 );
 
 // Index for faster queries by user
 taskSchema.index({ user: 1, createdAt: -1 });
+
+// TTL index — auto-delete guest tasks after expiry
+taskSchema.index({ guestExpiresAt: 1 }, { expireAfterSeconds: 0 });
 
 module.exports = mongoose.model('Task', taskSchema);
