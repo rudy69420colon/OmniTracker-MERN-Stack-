@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 const RegisterForm = () => {
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
   const { register, loading } = useAuth();
   const navigate = useNavigate();
 
@@ -15,15 +16,33 @@ const RegisterForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.password.length < 6) {
-      return toast.error('Password must be at least 6 characters');
+    setErrorMsg('');
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      return setErrorMsg('Invalid email format');
     }
+
+    const { password } = formData;
+    if (password.length < 10) {
+      return setErrorMsg('Password must be at least 10 characters');
+    }
+    if (!/[A-Z]/.test(password)) {
+      return setErrorMsg('Password must contain at least one uppercase letter');
+    }
+    if (!/[a-z]/.test(password)) {
+      return setErrorMsg('Password must contain at least one lowercase letter');
+    }
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+      return setErrorMsg('Password must contain at least one special character');
+    }
+
     try {
-      await register(formData.name, formData.email, formData.password);
+      await register(formData.name, formData.email, password);
       toast.success('Account created! Welcome aboard 🎉');
       navigate('/dashboard');
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Registration failed');
+      setErrorMsg(err.response?.data?.message || 'Registration failed');
     }
   };
 
@@ -33,6 +52,12 @@ const RegisterForm = () => {
         <h1>Create account</h1>
         <p>Start tracking your tasks today</p>
       </div>
+
+      {errorMsg && (
+        <div style={{ color: '#f38ba8', backgroundColor: 'rgba(243,139,168,0.1)', padding: '10px', borderRadius: '8px', marginBottom: '16px', fontSize: '14px', textAlign: 'center' }}>
+          {errorMsg}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="auth-form">
         <div className="form-group">

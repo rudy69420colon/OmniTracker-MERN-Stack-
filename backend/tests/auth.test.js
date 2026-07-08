@@ -35,7 +35,7 @@ describe('Auth Routes', () => {
       const res = await request(app).post('/api/auth/register').send({
         name: 'Test User',
         email: 'test@example.com',
-        password: 'password123',
+        password: 'Password123!',
       });
 
       expect(res.statusCode).toBe(201);
@@ -58,7 +58,7 @@ describe('Auth Routes', () => {
       const res = await request(app).post('/api/auth/register').send({
         name: 'Test User',
         email: 'test@example.com',
-        password: 'password123',
+        password: 'Password123!',
       });
 
       expect(res.statusCode).toBe(409);
@@ -84,7 +84,7 @@ describe('Auth Routes', () => {
       });
 
       expect(res.statusCode).toBe(400);
-      expect(res.body.message).toMatch(/6/);
+      expect(res.body.message).toMatch(/10/);
     });
   });
 
@@ -97,7 +97,7 @@ describe('Auth Routes', () => {
 
       const res = await request(app)
         .post('/api/auth/login')
-        .send({ email: 'test@example.com', password: 'password123' });
+        .send({ email: 'test@example.com', password: 'Password123!' });
 
       expect(res.statusCode).toBe(200);
       expect(res.body).toHaveProperty('token');

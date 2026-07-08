@@ -8,6 +8,7 @@ const LoginForm = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
   const [guestLoading, setGuestLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
   const { login, loginAsGuest, loading } = useAuth();
   const navigate = useNavigate();
 
@@ -16,12 +17,19 @@ const LoginForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMsg('');
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      return setErrorMsg('Invalid email id or password entered');
+    }
+
     try {
       await login(formData.email, formData.password);
       toast.success('Welcome back!');
       navigate('/dashboard');
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Login failed');
+      setErrorMsg('Invalid email id or password entered');
     }
   };
 
@@ -44,6 +52,12 @@ const LoginForm = () => {
         <h1>Welcome back</h1>
         <p>Sign in to your account</p>
       </div>
+
+      {errorMsg && (
+        <div style={{ color: '#f38ba8', backgroundColor: 'rgba(243,139,168,0.1)', padding: '10px', borderRadius: '8px', marginBottom: '16px', fontSize: '14px', textAlign: 'center' }}>
+          {errorMsg}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="auth-form">
         <div className="form-group">

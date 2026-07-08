@@ -23,7 +23,10 @@ const validateRegister = [
     .normalizeEmail(),
   body('password')
     .notEmpty().withMessage('Password is required')
-    .isLength({ min: 6, max: 128 }).withMessage('Password must be 6–128 characters'),
+    .isLength({ min: 10, max: 128 }).withMessage('Password must be at least 10 characters')
+    .matches(/[A-Z]/).withMessage('Password must contain at least one uppercase letter')
+    .matches(/[a-z]/).withMessage('Password must contain at least one lowercase letter')
+    .matches(/[!@#$%^&*(),.?":{}|<>]/).withMessage('Password must contain at least one special character'),
   handleValidationErrors,
 ];
 
@@ -31,10 +34,10 @@ const validateLogin = [
   body('email')
     .trim()
     .notEmpty().withMessage('Email is required')
-    .isEmail().withMessage('Please enter a valid email')
+    .isEmail().withMessage('Invalid email id or password entered')
     .normalizeEmail(),
   body('password')
-    .notEmpty().withMessage('Password is required'),
+    .notEmpty().withMessage('Invalid email id or password entered'),
   handleValidationErrors,
 ];
 

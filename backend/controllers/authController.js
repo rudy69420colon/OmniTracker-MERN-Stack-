@@ -44,7 +44,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
   if (!user || !(await user.matchPassword(password))) {
     res.status(401);
-    throw new Error('Invalid email or password');
+    throw new Error('Invalid email id or password entered');
   }
 
   res.status(200).json({
